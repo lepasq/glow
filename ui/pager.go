@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"os"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -257,6 +259,16 @@ func (m pagerModel) Update(msg tea.Msg) (pagerModel, tea.Cmd) {
 				m.toggleHelp()
 				if m.viewport.HighPerformanceRendering {
 					cmds = append(cmds, viewport.Sync(m.viewport))
+				}
+			case "v":
+				if editor, err := findEditor(); err == nil {
+					cmd := exec.Command(editor, m.currentDocument.localPath)
+					cmd.Stdin = os.Stdin
+					cmd.Stdout = os.Stdout
+					cmd.Stderr = os.Stderr
+					if err := cmd.Run(); err != nil {
+						log.Fatal(err)
+					}
 				}
 			}
 		}
@@ -543,6 +555,22 @@ func glamourRender(m pagerModel, markdown string) (string, error) {
 	}
 
 	return content, nil
+}
+
+// finds the default editor
+func findEditor() (string, error) {
+	if os.Getenv("EDITOR") != "" {
+		return os.Getenv("EDITOR"), nil
+	}
+	editors := []string{"nvim", "vim", "vi", "nano", "gedit"}
+	for _, editor := range editors {
+		a := ("/bin/" + editor)
+		fmt.Println(a)
+		if _, err := exec.LookPath("/bin/" + editor); err == nil {
+			return "/bin/" + editor, nil
+		}
+	}
+	return "", fmt.Errorf("Couldn't find an editor on this system.")
 }
 
 // ETC

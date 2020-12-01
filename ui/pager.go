@@ -462,6 +462,7 @@ func (m pagerModel) helpView() (s string) {
 		"",
 		memoOrStash,
 		"esc     back to files",
+		"v       edit file with $EDITOR or $VISUAL",
 		"q       quit",
 	}
 
@@ -475,10 +476,10 @@ func (m pagerModel) helpView() (s string) {
 	s += "b/pgup   page up             " + col1[2] + "\n"
 	s += "f/pgdn   page down           " + col1[3] + "\n"
 	s += "u        ½ page up           " + col1[4] + "\n"
-	s += "d        ½ page down         "
+	s += "d        ½ page down         " + col1[5] + "\n"
 
-	if len(col1) > 5 {
-		s += col1[5]
+	if len(col1) > 6 {
+		s += col1[6]
 	}
 
 	s = indent(s, 2)
@@ -562,6 +563,9 @@ func findEditor() (string, error) {
 	if os.Getenv("EDITOR") != "" {
 		return os.Getenv("EDITOR"), nil
 	}
+	if os.Getenv("VISUAL") != "" {
+		return os.Getenv("VISUAL"), nil
+	}
 	editors := []string{"nvim", "vim", "vi", "nano", "gedit", "code", "subl"}
 	for _, editor := range editors {
 		a := ("/bin/" + editor)
@@ -570,7 +574,7 @@ func findEditor() (string, error) {
 			return "/bin/" + editor, nil
 		}
 	}
-	return "", fmt.Errorf("Couldn't find an editor on this system.")
+	return "", fmt.Errorf("Couldn't find an editor on this system")
 }
 
 // ETC

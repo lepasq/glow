@@ -562,11 +562,11 @@ func findEditor() (string, error) {
 	if os.Getenv("EDITOR") != "" {
 		return os.Getenv("EDITOR"), nil
 	}
-	editors := []string{"nvim", "vim", "vi", "nano", "gedit"}
+	editors := []string{"nvim", "vim", "vi", "nano", "gedit", "code", "subl"}
 	for _, editor := range editors {
 		a := ("/bin/" + editor)
 		fmt.Println(a)
-		if _, err := exec.LookPath("/bin/" + editor); err == nil {
+		if _, program := exec.LookPath("/bin/" + editor); program == nil {
 			return "/bin/" + editor, nil
 		}
 	}
